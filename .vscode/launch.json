@@ -9,7 +9,7 @@
       "request": "attach",
       "name": "Debug Program",
       "address": "127.0.0.1",
-      "port": 9229,
+      "port": 9230,
       "protocol": "auto",
       "restart": true
     },

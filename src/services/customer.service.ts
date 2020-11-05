@@ -1,31 +1,31 @@
-import { UserModel } from "../models/user.model";
-import { User, loginUser } from "../interfaces/user";
-import { signToken } from "../services/auth.service";
+import { CustomerModel } from "../models/customer.model";
+import { Customer, loginCustomer } from "../interfaces/customer";
+import { signToken } from "./auth.service";
 import { ErrorResponse } from "../utils/error-helper";
 import Mongoose from "mongoose";
-export class UserService {
+export class CustomerService {
   constructor() {}
-  async getOne(id): Promise<User> {
+  async getOne(id): Promise<Customer> {
     const isValid = Mongoose.Types.ObjectId.isValid(id);
 
     if (!isValid) throw new ErrorResponse(406, `${id} is not valid id!`);
 
-    return UserModel.findById(id);
+    return CustomerModel.findById(id);
   }
 
-  async create(user): Promise<User> {
-    const res = await UserModel.create(user);
+  async create(customer): Promise<Customer> {
+    const res = await CustomerModel.create(customer);
     return res;
   }
   async fetch(): Promise<any> {
-    return UserModel.find();
+    return CustomerModel.find();
   }
-  async update(id, user): Promise<User> {
+  async update(id, customer): Promise<Customer> {
     const isValid = Mongoose.Types.ObjectId.isValid(id);
 
     if (!isValid) throw new ErrorResponse(406, `${id} is not valid id!`);
 
-    return UserModel.findOneAndUpdate({ _id: id }, user, { new: true });
+    return CustomerModel.findOneAndUpdate({ _id: id }, customer, { new: true });
   }
 
   async delete(id) {
@@ -33,14 +33,14 @@ export class UserService {
 
     if (!isValid) throw new ErrorResponse(406, `${id} is not valid id!`);
 
-    return UserModel.deleteOne({ _id: id });
+    return CustomerModel.deleteOne({ _id: id });
   }
 
-  async authenticate(user: loginUser) {
-    const { username, password } = user;
+  async authenticate(customer: loginCustomer) {
+    const { username, password } = customer;
 
     //fetch user detail using username
-    const existingUser = await UserModel.findOne({ username: username });
+    const existingUser = await CustomerModel.findOne({ username: username });
     if (!existingUser) throw new ErrorResponse(401, `${username} doesn't have account yet!`);
 
     // if user exist than compare the password

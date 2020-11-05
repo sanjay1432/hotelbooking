@@ -1,21 +1,22 @@
 import ENV from "./utils/env";
 import express from "express";
-import swaggerUi, { SwaggerUiOptions, SwaggerOptions } from "swagger-ui-express";
+import swaggerUi from "swagger-ui-express";
 import path from "path";
 import bodyParser from "body-parser";
 import { RegisterRoutes } from "./routes";
 import { ValidateError } from "tsoa";
-import cors, { CorsOptions, CorsOptionsDelegate } from "cors";
+import cors, { CorsOptions } from "cors";
 import { createServer } from "http";
 import { connect } from "./config/db";
-import logger from "./utils/logger";
+import insertDefaultUser from "./config/seed";
+
 const swaggerOptions = {
   url: `/swagger.json`,
   docExpansion: "list",
   filter: true
 };
 
-class TsoaServer {
+class HotelBookingServer {
   app: express.Express;
   server = createServer();
   whitelist = [...ENV.CORS_ORIGINS, "http://localhost"];
@@ -44,7 +45,7 @@ class TsoaServer {
 
   expressErrorHandler(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
     if (err instanceof ValidateError) {
-      logger.error(JSON.stringify({ ...err, path: req.path }, null, 2));
+      console.log(JSON.stringify({ ...err, path: req.path }, null, 2));
     } else {
       res.status(err["status"] ? err["status"] : 500).send(err["message"]);
     }
@@ -54,11 +55,12 @@ class TsoaServer {
     await connect();
     this.initExpress();
     this.server.listen(ENV.PORT, () => {
-      logger.info(`Server listening on port ${ENV.PORT}`);
+      console.log(`Server listening on port ${ENV.PORT}`);
     });
+    insertDefaultUser();
   }
 }
 
-const appServer = new TsoaServer();
+const appServer = new HotelBookingServer();
 
 export default appServer;

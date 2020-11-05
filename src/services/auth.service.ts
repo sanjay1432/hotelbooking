@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import ENV from "../utils/env";
-import { UserModel } from "../models/user.model";
+import { CustomerModel } from "../models/customer.model";
 
 export enum SecurityName {
   BEARER = "bearer",
@@ -8,7 +8,7 @@ export enum SecurityName {
 }
 
 export const signToken = info => {
-  return jwt.sign(info, ENV.JWT_SECRET, { algorithm: "HS256", expiresIn: "60s" });
+  return jwt.sign(info, ENV.JWT_SECRET, { algorithm: "HS256", expiresIn: "60m" });
 };
 export async function expressAuthentication(request, securityName, _scopes): Promise<any> {
   switch (securityName) {
@@ -18,7 +18,7 @@ export async function expressAuthentication(request, securityName, _scopes): Pro
       const data = validateToken(bearertoken);
       if (!data) throw Error("Token is not valid");
       const { _id } = data;
-      const user = await UserModel.findById(_id);
+      const user = await CustomerModel.findById(_id);
       if (!user) throw Error("No user for provided token");
       return user;
     }

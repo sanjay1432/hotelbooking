@@ -1,11 +1,11 @@
 import { Schema, Model, model, Document } from "mongoose";
 import bcrypt from "bcrypt";
-import { User } from "../interfaces/user";
+import { Customer } from "../interfaces/customer";
 import ENV from "../utils/env";
 
-interface UserDoc extends User, Document {}
+interface CustomerDoc extends Customer, Document {}
 
-const UserSchema: Schema = new Schema({
+const CustomerSchema: Schema = new Schema({
   email: String,
   username: String,
   phoneNumbers: String,
@@ -13,47 +13,47 @@ const UserSchema: Schema = new Schema({
   dob: String
 });
 
-UserSchema.pre<UserDoc>("save", function(next) {
-  const user = this;
+CustomerSchema.pre<CustomerDoc>("save", function(next) {
+  const customer = this;
   // only hash the password if it has been modified (or is new)
-  if (!user.isModified("password")) return next();
+  if (!customer.isModified("password")) return next();
 
   // generate a salt
   bcrypt.genSalt(ENV.SALT_WORK_FACTOR, function(err, salt) {
     if (err) return next(err);
 
     // hash the password along with our new salt
-    bcrypt.hash(user.password, salt, function(err, hash) {
+    bcrypt.hash(customer.password, salt, function(err, hash) {
       if (err) return next(err);
 
       // override the cleartext password with the hashed one
-      user.password = hash;
+      customer.password = hash;
       next();
     });
   });
 });
 
-UserSchema.methods.comparePasswords = async (candidatePassword, savedPassword) => {
+CustomerSchema.methods.comparePasswords = async (candidatePassword, savedPassword) => {
   const isValid = await bcrypt.compare(candidatePassword, savedPassword);
   return isValid;
 };
 
-UserSchema.methods.generateHash = function(password) {
+CustomerSchema.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8));
 };
 
-UserSchema.methods.isPasswordValid = function(password) {
+CustomerSchema.methods.isPasswordValid = function(password) {
   return bcrypt.compareSync(password, this.local.password);
 };
 
-// Omit the password when returning a user
-UserSchema.set("toJSON", {
+// Omit the password when returning a customer
+CustomerSchema.set("toJSON", {
   transform: function(doc, ret) {
     delete ret.password;
     return ret;
   }
 });
 // Use Model generic from mongoose to create a model of User type.
-const UserModel: Model<UserDoc> = model<UserDoc>("User", UserSchema);
+const CustomerModel: Model<CustomerDoc> = model<CustomerDoc>("Customer", CustomerSchema);
 
-export { UserModel };
+export { CustomerModel };

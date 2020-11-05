@@ -6,8 +6,8 @@ const basePath = "/api",
 
 const swaggerOptions: ExtendedSpecConfig = {
   version: "1.0.0",
-  name: "tsoa-base",
-  description: "tsoa-base Documentation",
+  name: "Hotel-Booking",
+  description: "Hotel-Booking Documentation",
   schemes: ["https", "http"],
   basePath,
   entryFile,
